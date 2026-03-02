@@ -8,7 +8,12 @@ Bulletin board service.
 
 The default `dev` profile uses an in-memory H2 database and seeds 10 sample bulletins through `DataInitializer`, so the API works immediately after startup.
 
-API documentation is available via Swagger UI at `http://localhost:8080/swagger-ui/index.html`.
+API documentation локального запуска доступна по адресу `http://localhost:8080/swagger-ui/index.html`.
+
+Продакшн-развёртывание для проверки задания доступно по домену:
+
+- Swagger UI: `http://bulletins.mooo.com:8080/swagger-ui/index.html`
+- Actuator health: `http://bulletins.mooo.com:9090/actuator/health`
 
 ## Project layout
 
