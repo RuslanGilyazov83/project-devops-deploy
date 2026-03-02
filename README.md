@@ -1,7 +1,6 @@
 # Project DevOps Deploy
 
 [![CI](https://github.com/RuslanGilyazov83/project-devops-deploy/actions/workflows/ci.yml/badge.svg)](https://github.com/RuslanGilyazov83/project-devops-deploy/actions/workflows/ci.yml)
-[![hexlet-check](https://github.com/RuslanGilyazov83/project-devops-deploy/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/RuslanGilyazov83/project-devops-deploy/actions/workflows/hexlet-check.yml)
 
 Bulletin board service.
 
