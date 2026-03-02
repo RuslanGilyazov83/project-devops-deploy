@@ -1,0 +1,65 @@
+---
+- name: Подготовка сервера в Yandex Cloud для Docker-деплоя
+  hosts: yc_server
+  become: true
+
+  vars:
+    # Пользователь ВМ, которого добавляем в группу docker
+    docker_users:
+      - yc-user
+
+  roles:
+    - geerlingguy.docker
+
+  tasks:
+    - name: Устанавливаем ufw для управления фаерволом
+      ansible.builtin.apt:
+        name: ufw
+        state: present
+        update_cache: true
+
+    - name: Запрещаем входящие подключения по умолчанию, разрешаем исходящие
+      community.general.ufw:
+        direction: incoming
+        policy: deny
+
+    - name: Разрешаем исходящие подключения
+      community.general.ufw:
+        direction: outgoing
+        policy: allow
+
+    - name: Разрешаем SSH
+      community.general.ufw:
+        rule: allow
+        port: "22"
+        proto: tcp
+
+    - name: Разрешаем HTTP
+      community.general.ufw:
+        rule: allow
+        port: "80"
+        proto: tcp
+
+    - name: Разрешаем HTTPS
+      community.general.ufw:
+        rule: allow
+        port: "443"
+        proto: tcp
+
+    - name: Разрешаем порт приложения
+      community.general.ufw:
+        rule: allow
+        port: "8080"
+        proto: tcp
+
+    - name: Разрешаем порт мониторинга/actuator
+      community.general.ufw:
+        rule: allow
+        port: "9090"
+        proto: tcp
+
+    - name: Включаем ufw
+      community.general.ufw:
+        state: enabled
+        logging: "on"
+
