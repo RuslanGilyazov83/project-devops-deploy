@@ -144,6 +144,20 @@ docker run --rm -p 8080:8080 \
   ...
 ```
 
+### Запуск через Docker-образ
+
+Для backend-приложения подготовлен Dockerfile с многоступенчатой сборкой. Образ собирается и запускается так:
+
+```bash
+# Сборка образа (по умолчанию: ruslangilyazov/project-devops-deploy:dev)
+make docker-build
+
+# Запуск контейнера локально
+make docker-run
+```
+
+Ожидаемый артефакт после выполнения задания — Docker-образ приложения, доступный локально и в Docker Hub по имени `ruslangilyazov/project-devops-deploy`.
+
 Useful JVM options:
 
 - `-Xms/-Xmx` — set memory limits inside the container.

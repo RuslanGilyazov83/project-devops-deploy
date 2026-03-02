@@ -1,0 +1,13 @@
+## Игнорируем лишние файлы при сборке Docker-образа
+.git
+.gradle
+build
+out
+
+frontend/node_modules
+frontend/dist
+
+.idea
+.vscode
+*.iml
+
