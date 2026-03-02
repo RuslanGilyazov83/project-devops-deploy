@@ -8,8 +8,19 @@
     docker_users:
       - yc-user
 
+    # Имя и тег Docker-образа приложения
+    app_image_name: ruslangilyazov/project-devops-deploy
+    app_image_tag: "{{ app_image_tag | default('latest') }}"
+
+    # Имя контейнера
+    app_container_name: bulletins-app
+
+    # Переменные окружения приложения (чувствительные значения храните в Ansible Vault)
+    app_env: {}
+
   roles:
     - geerlingguy.docker
+    - app_deploy
 
   tasks:
     - name: Устанавливаем ufw для управления фаерволом

@@ -1,0 +1,37 @@
+---
+- name: Создаём каталог для данных приложения
+  ansible.builtin.file:
+    path: /opt/bulletins
+    state: directory
+    owner: yc-user
+    group: yc-user
+    mode: "0755"
+
+- name: Создаём каталог для логов приложения
+  ansible.builtin.file:
+    path: /var/log/bulletins
+    state: directory
+    owner: yc-user
+    group: yc-user
+    mode: "0755"
+
+- name: Подтягиваем Docker-образ приложения
+  community.docker.docker_image:
+    name: "{{ app_image_name }}:{{ app_image_tag }}"
+    source: pull
+
+- name: Запускаем контейнер приложения
+  community.docker.docker_container:
+    name: "{{ app_container_name }}"
+    image: "{{ app_image_name }}:{{ app_image_tag }}"
+    restart_policy: always
+    state: started
+    recreate: true
+    published_ports:
+      - "8080:8080"
+      - "9090:9090"
+    volumes:
+      - "/opt/bulletins:/opt/bulletins"
+      - "/var/log/bulletins:/var/log/bulletins"
+    env: "{{ app_env }}"
+

@@ -21,6 +21,7 @@ build:
 # Имя Docker-образа в реестре контейнеров
 IMAGE_NAME ?= ruslangilyazov/project-devops-deploy
 IMAGE_TAG ?= dev
+DEPLOY_TAG ?= latest
 
 # Сборка Docker-образа приложения
 docker-build:
@@ -30,10 +31,13 @@ docker-build:
 docker-run:
 	docker run --rm -p 8080:8080 -p 9090:9090 $(IMAGE_NAME):$(IMAGE_TAG)
 
+deploy:
+	ansible-playbook -i inventory.ini playbook.yml -e app_image_tag=$(DEPLOY_TAG)
+
 lint:
 	./gradlew spotlessCheck
 
 lint-fix:
 	./gradlew spotlessApply
 
-.PHONY: build docker-build docker-run
+.PHONY: build docker-build docker-run deploy
