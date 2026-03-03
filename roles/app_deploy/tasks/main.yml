@@ -20,6 +20,21 @@
     name: "{{ app_image_name }}:{{ app_image_tag }}"
     source: pull
 
+- name: Убеждаемся, что docker-сеть для приложения существует
+  community.docker.docker_network:
+    name: bulletins-net
+
+- name: Запускаем миграции схемы БД
+  community.docker.docker_container:
+    name: bulletins-migrations
+    image: "{{ app_image_name }}:{{ app_image_tag }}"
+    state: started
+    restart_policy: "no"
+    auto_remove: true
+    networks:
+      - name: bulletins-net
+    env: "{{ app_env }}"
+
 - name: Запускаем контейнер приложения
   community.docker.docker_container:
     name: "{{ app_container_name }}"
@@ -33,5 +48,7 @@
     volumes:
       - "/opt/bulletins:/opt/bulletins"
       - "/var/log/bulletins:/var/log/bulletins"
+    networks:
+      - name: bulletins-net
     env: "{{ app_env }}"
 

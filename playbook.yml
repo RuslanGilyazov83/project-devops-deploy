@@ -3,23 +3,38 @@
   hosts: yc_server
   become: true
 
+  vars_files:
+    # Здесь ожидается Ansible Vault с чувствительными данными (БД, пароли и т.п.)
+    - group_vars/yc_server/vault.yml
+
   vars:
     # Пользователь ВМ, которого добавляем в группу docker
     docker_users:
       - yc-user
 
+    # Параметры базы данных PostgreSQL
+    postgres_db: "{{ vault_postgres_db }}"
+    postgres_user: "{{ vault_postgres_user }}"
+    postgres_password: "{{ vault_postgres_password }}"
+
     # Имя и тег Docker-образа приложения
     app_image_name: ruslangilyazov/project-devops-deploy
-    app_image_tag: "{{ app_image_tag | default('latest') }}"
+    # Тег по умолчанию — latest, можно переопределить extra-vars (app_image_tag=...)
+    app_image_tag: latest
 
     # Имя контейнера
     app_container_name: bulletins-app
 
     # Переменные окружения приложения (чувствительные значения храните в Ansible Vault)
-    app_env: {}
+    app_env:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://bulletins-postgres:5432/{{ postgres_db }}"
+      SPRING_DATASOURCE_USERNAME: "{{ postgres_user }}"
+      SPRING_DATASOURCE_PASSWORD: "{{ postgres_password }}"
 
   roles:
     - geerlingguy.docker
+    - db_postgres
     - app_deploy
 
   tasks:

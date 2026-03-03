@@ -1,0 +1,22 @@
+---
+# Именованный том — права задаёт сам Postgres, данные сохраняются между перезапусками
+- name: Создаём docker-сеть для приложения и БД
+  community.docker.docker_network:
+    name: bulletins-net
+
+- name: Запускаем контейнер PostgreSQL
+  community.docker.docker_container:
+    name: bulletins-postgres
+    image: postgres:16-alpine
+    restart_policy: always
+    state: started
+    env:
+      POSTGRES_DB: "{{ postgres_db }}"
+      POSTGRES_USER: "{{ postgres_user }}"
+      POSTGRES_PASSWORD: "{{ postgres_password }}"
+    volumes:
+      - "postgres_data:/var/lib/postgresql/data"
+    networks:
+      - name: bulletins-net
+    published_ports: []
+

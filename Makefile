@@ -32,7 +32,7 @@ docker-run:
 	docker run --rm -p 8080:8080 -p 9090:9090 $(IMAGE_NAME):$(IMAGE_TAG)
 
 deploy:
-	ansible-playbook -i inventory.ini playbook.yml -e app_image_tag=$(DEPLOY_TAG)
+	ansible-playbook -i inventory.ini playbook.yml -e app_image_tag=$(DEPLOY_TAG) --ask-vault-pass
 
 lint:
 	./gradlew spotlessCheck
