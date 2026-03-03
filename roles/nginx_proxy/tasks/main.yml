@@ -1,0 +1,23 @@
+---
+- name: Создаём каталог для кеша Nginx
+  ansible.builtin.file:
+    path: /var/cache/nginx/bulletins
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: "0755"
+
+- name: Копируем конфиг виртуального хоста Nginx
+  ansible.builtin.template:
+    src: bulletins.conf.j2
+    dest: /etc/nginx/conf.d/bulletins.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Перезагружаем Nginx
+
+- name: Убираем дефолтный конфиг Nginx, если существует
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: Перезагружаем Nginx

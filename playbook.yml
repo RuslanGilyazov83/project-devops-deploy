@@ -23,6 +23,9 @@
     s3_secret_key: "{{ vault_s3_secret_key | default('') }}"
     s3_cdn_url: "{{ vault_s3_cdn_url | default('') }}"
 
+    # Nginx: имя сервера для виртуального хоста
+    nginx_server_name: bulletins.mooo.com
+
     # Имя и тег Docker-образа приложения
     app_image_name: ruslangilyazov/project-devops-deploy
     # Тег по умолчанию — latest, можно переопределить extra-vars (app_image_tag=...)
@@ -46,8 +49,10 @@
 
   roles:
     - geerlingguy.docker
+    - geerlingguy.nginx
     - db_postgres
     - app_deploy
+    - nginx_proxy
 
   tasks:
     - name: Устанавливаем ufw для управления фаерволом
