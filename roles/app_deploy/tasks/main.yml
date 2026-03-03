@@ -51,4 +51,3 @@
     networks:
       - name: bulletins-net
     env: "{{ app_env }}"
-
