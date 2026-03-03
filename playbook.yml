@@ -16,6 +16,12 @@
     postgres_db: "{{ vault_postgres_db }}"
     postgres_user: "{{ vault_postgres_user }}"
     postgres_password: "{{ vault_postgres_password }}"
+    s3_bucket: "{{ vault_s3_bucket | default('') }}"
+    s3_region: "{{ vault_s3_region | default('') }}"
+    s3_endpoint: "{{ vault_s3_endpoint | default('') }}"
+    s3_access_key: "{{ vault_s3_access_key | default('') }}"
+    s3_secret_key: "{{ vault_s3_secret_key | default('') }}"
+    s3_cdn_url: "{{ vault_s3_cdn_url | default('') }}"
 
     # Имя и тег Docker-образа приложения
     app_image_name: ruslangilyazov/project-devops-deploy
@@ -31,6 +37,12 @@
       SPRING_DATASOURCE_URL: "jdbc:postgresql://bulletins-postgres:5432/{{ postgres_db }}"
       SPRING_DATASOURCE_USERNAME: "{{ postgres_user }}"
       SPRING_DATASOURCE_PASSWORD: "{{ postgres_password }}"
+      STORAGE_S3_BUCKET: "{{ s3_bucket }}"
+      STORAGE_S3_REGION: "{{ s3_region }}"
+      STORAGE_S3_ENDPOINT: "{{ s3_endpoint }}"
+      STORAGE_S3_ACCESSKEY: "{{ s3_access_key }}"
+      STORAGE_S3_SECRETKEY: "{{ s3_secret_key }}"
+      STORAGE_S3_CDNURL: "{{ s3_cdn_url }}"
 
   roles:
     - geerlingguy.docker

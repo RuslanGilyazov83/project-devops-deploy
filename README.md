@@ -218,3 +218,41 @@ Override the host/port with `MANAGEMENT_SERVER_PORT` if you changed it; no Prome
     - Image shows up in bulletin show view (URL should either point to CDN or be a presigned S3 link).
     - Object exists in S3 bucket (check via AWS console or `aws s3 ls s3://your-bucket/bulletins/...`).
 5. Optional: run `curl -I "$(curl -s .../api/files/view?key=... | jq -r .url)"` to ensure the presigned URL is valid from the production environment.
+
+## Assignment 7: Yandex Object Storage (manual setup)
+
+If you do not automate bucket creation with Terraform/Ansible yet, use the documented manual flow below.
+
+1. Create a service account in Yandex Cloud with minimum Object Storage permissions for one bucket:
+    - `storage.editor` on the target bucket (or equivalent custom policy with read/write objects).
+2. Create a static access key pair (Access Key / Secret Key) for that service account.
+3. Create a bucket in Object Storage, for example `bulletins-images-prod`.
+4. Keep the bucket private; application accesses objects via S3 API and issues temporary presigned links.
+5. Save credentials and bucket settings into Ansible Vault (`group_vars/yc_server/vault.yml`):
+
+    ```yaml
+    vault_s3_bucket: bulletins-images-prod
+    vault_s3_region: ru-central1
+    vault_s3_endpoint: https://storage.yandexcloud.net
+    vault_s3_access_key: <access_key>
+    vault_s3_secret_key: <secret_key>
+    vault_s3_cdn_url: ""
+    ```
+
+6. Deploy with vault password:
+
+    ```bash
+    ansible-playbook -i inventory.ini playbook.yml --ask-vault-pass
+    ```
+
+`playbook.yml` injects these values into container env vars (`STORAGE_S3_*`). If all required S3 variables are set, backend switches from local storage to `S3ImageStorageService`.
+
+### Optional verification via AWS CLI (S3-compatible endpoint)
+
+```bash
+aws --endpoint-url https://storage.yandexcloud.net s3 ls s3://bulletins-images-prod/
+```
+
+After uploading a file in UI:
+- verify new object appears in bucket;
+- verify `GET /api/files/view?key=...` returns a working URL.
