@@ -3,10 +3,6 @@
   hosts: yc_server
   become: true
 
-  vars_files:
-    # Здесь ожидается Ansible Vault с чувствительными данными (БД, пароли и т.п.)
-    - group_vars/yc_server/vault.yml
-
   vars:
     # Параметры из Vault (секретные значения)
     postgres_db: "{{ vault_postgres_db }}"
