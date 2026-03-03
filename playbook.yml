@@ -26,6 +26,25 @@
     # Nginx: имя сервера для виртуального хоста
     nginx_server_name: bulletins.mooo.com
 
+    # Certbot (Let's Encrypt)
+    certbot_install_method: package
+    certbot_admin_email: "{{ vault_certbot_email }}"
+    certbot_create_if_missing: true
+    certbot_create_method: standalone
+    # Останавливаем Nginx на время получения сертификата (standalone-режим)
+    certbot_create_standalone_stop_services:
+      - nginx
+    certbot_certs:
+      - domains:
+          - "{{ nginx_server_name }}"
+    # Автопродление через cron
+    certbot_auto_renew: true
+    certbot_auto_renew_user: root
+    certbot_auto_renew_hour: "3"
+    certbot_auto_renew_minute: "30"
+    # После продления — перезапуск Nginx
+    certbot_auto_renew_options: "--quiet --deploy-hook 'systemctl reload nginx'"
+
     # Имя и тег Docker-образа приложения
     app_image_name: ruslangilyazov/project-devops-deploy
     # Тег по умолчанию — latest, можно переопределить extra-vars (app_image_tag=...)
@@ -53,6 +72,7 @@
     - db_postgres
     - app_deploy
     - nginx_proxy
+    - geerlingguy.certbot
 
   tasks:
     - name: Устанавливаем ufw для управления фаерволом
