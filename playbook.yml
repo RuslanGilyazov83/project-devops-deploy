@@ -8,11 +8,7 @@
     - group_vars/yc_server/vault.yml
 
   vars:
-    # Пользователь ВМ, которого добавляем в группу docker
-    docker_users:
-      - yc-user
-
-    # Параметры базы данных PostgreSQL
+    # Параметры из Vault (секретные значения)
     postgres_db: "{{ vault_postgres_db }}"
     postgres_user: "{{ vault_postgres_user }}"
     postgres_password: "{{ vault_postgres_password }}"
@@ -23,37 +19,10 @@
     s3_secret_key: "{{ vault_s3_secret_key | default('') }}"
     s3_cdn_url: "{{ vault_s3_cdn_url | default('') }}"
 
-    # Nginx: имя сервера для виртуального хоста
-    nginx_server_name: bulletins.mooo.com
-
-    # Certbot (Let's Encrypt)
-    certbot_install_method: package
+    # Email для Let's Encrypt из Vault
     certbot_admin_email: "{{ vault_certbot_email }}"
-    certbot_create_if_missing: true
-    certbot_create_method: standalone
-    # Останавливаем Nginx на время получения сертификата (standalone-режим)
-    certbot_create_standalone_stop_services:
-      - nginx
-    certbot_certs:
-      - domains:
-          - "{{ nginx_server_name }}"
-    # Автопродление через cron
-    certbot_auto_renew: true
-    certbot_auto_renew_user: root
-    certbot_auto_renew_hour: "3"
-    certbot_auto_renew_minute: "30"
-    # После продления — перезапуск Nginx
-    certbot_auto_renew_options: "--quiet --deploy-hook 'systemctl reload nginx'"
 
-    # Имя и тег Docker-образа приложения
-    app_image_name: ruslangilyazov/project-devops-deploy
-    # Тег по умолчанию — latest, можно переопределить extra-vars (app_image_tag=...)
-    app_image_tag: latest
-
-    # Имя контейнера
-    app_container_name: bulletins-app
-
-    # Переменные окружения приложения (чувствительные значения храните в Ansible Vault)
+    # Переменные окружения приложения (чувствительные значения из Vault)
     app_env:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: "jdbc:postgresql://bulletins-postgres:5432/{{ postgres_db }}"

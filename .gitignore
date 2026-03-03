@@ -36,3 +36,10 @@ out/
 ### VS Code ###
 .vscode/
 *.db
+
+### Ansible ###
+*.retry
+.vault_pass
+.vault_pass.txt
+vault_pass
+vault_pass.txt

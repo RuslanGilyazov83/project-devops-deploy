@@ -1,0 +1,29 @@
+---
+# Пользователь ВМ, которого добавляем в группу docker
+docker_users:
+  - yc-user
+
+# Nginx: имя сервера для виртуального хоста
+nginx_server_name: bulletins.mooo.com
+
+# Certbot (Let's Encrypt)
+certbot_install_method: package
+certbot_create_if_missing: true
+certbot_create_method: standalone
+certbot_create_standalone_stop_services:
+  - nginx
+certbot_certs:
+  - domains:
+      - "{{ nginx_server_name }}"
+certbot_auto_renew: true
+certbot_auto_renew_user: root
+certbot_auto_renew_hour: "3"
+certbot_auto_renew_minute: "30"
+certbot_auto_renew_options: "--quiet --deploy-hook 'systemctl reload nginx'"
+
+# Имя и тег Docker-образа приложения
+app_image_name: ruslangilyazov/project-devops-deploy
+app_image_tag: latest
+
+# Имя контейнера приложения
+app_container_name: bulletins-app

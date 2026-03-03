@@ -12,8 +12,8 @@ API documentation локального запуска доступна по ад
 
 Продакшн-развёртывание для проверки задания доступно по домену:
 
-- Swagger UI: `http://bulletins.mooo.com:8080/swagger-ui/index.html`
-- Actuator health: `http://bulletins.mooo.com:9090/actuator/health`
+- Приложение: `https://bulletins.mooo.com/swagger-ui/index.html`
+- Actuator health: `https://bulletins.mooo.com:9090/actuator/health`
 
 ## Project layout
 
@@ -45,6 +45,23 @@ Key variables are read directly by Spring Boot (see `src/main/resources/applicat
 All other variables supported by Spring Boot can be overridden the same way; check the application configuration files if you need to confirm a property name.
 
 ## Requirements
+
+### Локальная машина (управляющая, для деплоя)
+
+- Python 3.8+
+- Ansible 2.14+
+- ansible-galaxy роли установлены: `make ansible-requirements`
+- SSH-ключ с доступом к целевому серверу
+- Пароль от Ansible Vault для расшифровки секретов
+
+### Целевой сервер (ВМ в Yandex Cloud)
+
+- Ubuntu 22.04 LTS или новее
+- Открытые порты: 22 (SSH), 80 (HTTP), 443 (HTTPS), 8080 (приложение), 9090 (actuator)
+- Пользователь с правами sudo
+- Docker и Docker Compose устанавливаются автоматически через Ansible
+
+### Для локальной разработки
 
 - JDK 21+.
 - Gradle 9.2.1.
