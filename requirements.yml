@@ -1,8 +1,0 @@
----
-roles:
-  - name: geerlingguy.docker
-    src: geerlingguy.docker
-  - name: geerlingguy.nginx
-    src: geerlingguy.nginx
-  - name: geerlingguy.certbot
-    src: geerlingguy.certbot
