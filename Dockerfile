@@ -2,30 +2,35 @@
 FROM node:20-alpine AS frontend-build
 WORKDIR /app/frontend
 
-# Устанавливаем зависимости
+# Сначала зависимости — слой кешируется, если package.json не менялся
 COPY frontend/package*.json ./
 RUN npm ci
 
-# Собираем React-приложение в frontend/dist
+# Затем исходники и сборка
 COPY frontend/ .
 RUN npm run build
 
 
-## Этап 2: сборка backend-приложения
+## Этап 2: сборка backend + встраивание фронтенда в JAR
 FROM eclipse-temurin:21-jdk-jammy AS build
 WORKDIR /app
 
-# Копируем исходники backend
 COPY . .
-
-# Кладём собранный фронтенд в static-ресурсы Spring Boot
-COPY --from=frontend-build /app/frontend/dist/ ./src/main/resources/static/
-
-# Даём права на gradlew под Linux
 RUN chmod +x ./gradlew
 
-# Сборка, тесты и упаковка jar
+# Собираем backend — тесты и упаковка без статики
 RUN ./gradlew clean test bootJar --no-daemon
+
+# Встраиваем фронтенд прямо в готовый JAR
+# (надёжнее чем через src/main/resources — Gradle не кеширует внешние COPY)
+WORKDIR /work
+RUN cp /app/build/libs/project-devops-deploy-0.0.1-SNAPSHOT.jar ./app.jar && \
+    jar xf app.jar && \
+    rm app.jar
+
+COPY --from=frontend-build /app/frontend/dist/ ./BOOT-INF/classes/static/
+
+RUN jar cfm app.jar META-INF/MANIFEST.MF .
 
 
 ## Этап 3: минимальный рантайм
@@ -35,8 +40,7 @@ WORKDIR /app
 # Профиль по умолчанию — dev с H2
 ENV SPRING_PROFILES_ACTIVE=dev
 
-# Копируем только собранный артефакт
-COPY --from=build /app/build/libs/project-devops-deploy-0.0.1-SNAPSHOT.jar /app/app.jar
+COPY --from=build /work/app.jar /app/app.jar
 
 EXPOSE 8080 9090
 
