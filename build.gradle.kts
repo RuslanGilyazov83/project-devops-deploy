@@ -61,6 +61,15 @@ dependencies {
     implementation(libs.logstashLogbackEncoder)
 }
 
+// Включаем собранный фронтенд в JAR как статику Spring Boot
+// frontend/dist появляется в Docker через COPY --from=frontend-build
+// Если папки нет (локальная разработка) — Gradle просто ничего не копирует
+tasks.processResources {
+    from("${projectDir}/frontend/dist") {
+        into("static")
+    }
+}
+
 tasks.test {
     useJUnitPlatform()
     testLogging {

@@ -11,24 +11,19 @@ COPY frontend/ .
 RUN npm run build
 
 
-## Этап 2: сборка backend
+## Этап 2: сборка backend — Gradle включит фронтенд в JAR через processResources
 FROM eclipse-temurin:21-jdk-jammy AS build
 WORKDIR /app
 
 COPY . .
+
+# Кладём собранный фронтенд туда, откуда Gradle его заберёт
+COPY --from=frontend-build /app/frontend/dist/ ./frontend/dist/
+
 RUN chmod +x ./gradlew
 
-# Собираем backend — тесты и упаковка JAR
+# processResources подхватит frontend/dist и упакует как статику в JAR
 RUN ./gradlew clean test bootJar --no-daemon
-
-# Добавляем фронтенд в JAR через zip -r (не перепаковывает, только дополняет)
-# zip требует нужной структуры папок: BOOT-INF/classes/static/
-RUN apt-get update && apt-get install -y --no-install-recommends zip \
-    && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /tmp/static
-COPY --from=frontend-build /app/frontend/dist/ ./BOOT-INF/classes/static/
-RUN zip -r /app/build/libs/project-devops-deploy-0.0.1-SNAPSHOT.jar BOOT-INF/
 
 
 ## Этап 3: минимальный рантайм
