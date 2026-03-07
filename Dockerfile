@@ -1,10 +1,25 @@
-## Многоступенчатая сборка backend-приложения
+## Этап 1: сборка фронтенда
+FROM node:20-alpine AS frontend-build
+WORKDIR /app/frontend
 
+# Устанавливаем зависимости
+COPY frontend/package*.json ./
+RUN npm ci
+
+# Собираем React-приложение в frontend/dist
+COPY frontend/ .
+RUN npm run build
+
+
+## Этап 2: сборка backend-приложения
 FROM eclipse-temurin:21-jdk-jammy AS build
 WORKDIR /app
 
-# Копируем исходники
+# Копируем исходники backend
 COPY . .
+
+# Кладём собранный фронтенд в static-ресурсы Spring Boot
+COPY --from=frontend-build /app/frontend/dist/ ./src/main/resources/static/
 
 # Даём права на gradlew под Linux
 RUN chmod +x ./gradlew
@@ -13,6 +28,7 @@ RUN chmod +x ./gradlew
 RUN ./gradlew clean test bootJar --no-daemon
 
 
+## Этап 3: минимальный рантайм
 FROM eclipse-temurin:21-jre-jammy AS runtime
 WORKDIR /app
 
@@ -26,4 +42,3 @@ EXPOSE 8080 9090
 
 # Поддерживаем JAVA_OPTS из переменных окружения
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
-
